@@ -1,0 +1,133 @@
+/* Relief Corps Organization - motion layer
+   Works with assets/motion.js. Nothing is hidden unless JS has armed it
+   (html.rco-m), and everything is disabled for "reduce motion" visitors. */
+
+:root{
+  --rco-ease:cubic-bezier(.22,.61,.36,1);
+  /* accent palette for the floating decorations (kept apart from the brand colours) */
+  --fl-teal:#19b3a6; --fl-coral:#ff7b5c; --fl-lilac:#9a86e8; --fl-sun:#ffc24b; --fl-sky:#52b5ee;
+}
+html{overflow-x:clip} /* decorations may poke past a corner; never cause sideways scroll */
+
+/* ---------- 1. Page entrance + scroll reveal ---------- */
+/* NOTE: keep this selector list in sync with the one in motion.js */
+.rco-m :is(
+  .pagehead>:not(.fl),
+  .hero-grid>div>*,
+  .hero .side,
+  .banner,
+  .hero-photo,
+  .statement>:not(.fl),
+  .section>.eyebrow,
+  .section>h2,
+  .cards>.card,
+  .principles>div,
+  .two-col>*,
+  .photos>*,
+  .mosaic>figure,
+  .loc>:not(.fl),
+  .partner-grid>*,
+  .band .wrap>*
+){opacity:0;transform:translateY(22px)}
+
+.rco-m :is(
+  .pagehead>:not(.fl),
+  .hero-grid>div>*,
+  .hero .side,
+  .banner,
+  .hero-photo,
+  .statement>:not(.fl),
+  .section>.eyebrow,
+  .section>h2,
+  .cards>.card,
+  .principles>div,
+  .two-col>*,
+  .photos>*,
+  .mosaic>figure,
+  .loc>:not(.fl),
+  .partner-grid>*,
+  .band .wrap>*
+).rco-in{opacity:1;transform:none;transition:opacity .7s ease,transform .7s var(--rco-ease)}
+
+/* soft fade for the whole page body as it loads */
+@keyframes rco-enter{from{opacity:0}}
+.rco-m main,.rco-m footer{animation:rco-enter .35s ease both}
+
+/* ---------- 2. Page leave (transition between pages) ---------- */
+/* Header and the WhatsApp button stay put; only the page content fades out. */
+main,footer{transition:opacity .22s ease,transform .22s ease}
+html.rco-leave main,html.rco-leave footer{opacity:0;transform:translateY(-8px);pointer-events:none}
+
+/* ---------- 3. Small hover / idle details ---------- */
+nav.main a{transition:border-color .2s ease,filter .2s ease}
+.btn{transition:transform .2s var(--rco-ease),filter .2s ease,box-shadow .2s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.16)}
+.btn:active{transform:none;box-shadow:none}
+
+.card{overflow:hidden}
+.card img{transition:transform .6s var(--rco-ease)}
+.card:hover img{transform:scale(1.045)}
+.card h3{transition:color .2s ease}
+.card .more{transition:letter-spacing .2s ease}
+.card:hover .more{letter-spacing:.02em}
+
+.mosaic figure{overflow:hidden;border-radius:4px}
+.mosaic img{transition:transform .6s var(--rco-ease)}
+.mosaic figure:hover img{transform:scale(1.04)}
+
+.progtabs a,.tags a{transition:border-color .2s ease,background-color .2s ease,color .2s ease}
+
+.wa{transition:background-color .2s ease,transform .2s var(--rco-ease)}
+.wa:hover{transform:translateY(-2px)}
+@keyframes rco-pulse{0%{box-shadow:0 6px 20px rgba(0,0,0,.22),0 0 0 0 rgba(37,211,102,.5)}
+  70%,100%{box-shadow:0 6px 20px rgba(0,0,0,.22),0 0 0 16px rgba(37,211,102,0)}}
+.wa{animation:rco-pulse 3.6s ease-out 2.5s infinite}
+.wa:hover{animation:none}
+
+/* ---------- 4. Floating decorations ---------- */
+/* Injected by motion.js. The outer .fl is moved by scroll + mouse (JS);
+   the inner <i> only does a slow idle drift (CSS). Purely decorative. */
+.fl-host{position:relative;isolation:isolate}
+.band.fl-host{overflow:hidden}
+.band>.wrap{position:relative;z-index:1}
+.fl{position:absolute;z-index:2;pointer-events:none;opacity:0;transition:opacity 1.2s ease .4s;will-change:transform}
+.fl.on{opacity:1}
+.fl.back{z-index:-1}
+.fl i{--k:1;display:block;width:calc(var(--s)*var(--k)*1px);height:calc(var(--s)*var(--k)*1px);
+  rotate:var(--r,0deg);animation:fl-bob var(--t,9s) ease-in-out var(--dl,0s) infinite}
+@keyframes fl-bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-9px) scale(1.04)}}
+
+.fl-ring i{border:3px solid var(--c);border-radius:50%;opacity:.75}
+.fl-dot i{background:var(--c);border-radius:50%;opacity:.85}
+.fl-blob i{background:var(--c);border-radius:58% 42% 55% 45%/45% 55% 45% 55%;opacity:.2}
+.fl-grid i{background-image:radial-gradient(var(--c) 2.2px,transparent 2.7px);background-size:14px 14px;opacity:.7}
+.fl-plus i{background:linear-gradient(var(--c),var(--c)) center/100% 4px no-repeat,linear-gradient(var(--c),var(--c)) center/4px 100% no-repeat;opacity:.85}
+.fl-bars i{height:7px;border-radius:2px;opacity:.9;
+  background:linear-gradient(90deg,var(--fl-teal) 0 33%,var(--fl-coral) 33% 66%,var(--fl-sun) 66%)}
+
+@media(max-width:860px){.fl i{--k:.7}.fl.hide-md{display:none}}
+@media(max-width:560px){.fl.hide-sm{display:none}}
+
+/* ---------- 5. Footer map ---------- */
+/* Dotted map of East & Central Africa up to Egypt (assets/map-africa.svg), South Sudan
+   highlighted with the four project locations (Bentiu, Bor, Akobo, Juba). Sits behind the
+   text, faded out towards the left so it never competes with the footer copy. It rises
+   into the 88px gap above the footer so the whole map has room. */
+footer{position:relative;isolation:isolate}
+footer::before{content:"";position:absolute;inset:-88px 0 0 0;z-index:-1;pointer-events:none;
+  background:url(map-africa.svg) no-repeat right 3% center/auto 100%;
+  -webkit-mask-image:linear-gradient(90deg,transparent 14%,#000 60%);
+  mask-image:linear-gradient(90deg,transparent 14%,#000 60%)}
+@media(max-width:760px){
+  footer::before{inset:-40px 0 0 0;background-position:center bottom;background-size:min(560px,140%) auto;opacity:.65;
+    -webkit-mask-image:none;mask-image:none}
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  .rco-m *{opacity:1!important;transform:none!important;transition:none!important;animation:none!important}
+  main,footer{transition:none}
+  .wa{animation:none}
+  .fl{transition:none}
+  .fl i{animation:none}
+}
